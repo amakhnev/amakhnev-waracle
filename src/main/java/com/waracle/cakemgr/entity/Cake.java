@@ -1,14 +1,16 @@
 package com.waracle.cakemgr.entity;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "CAKE")
+@Table(name = "Cakes")
 public class Cake implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -1798070786993154676L;
 
     @Id
@@ -19,8 +21,8 @@ public class Cake implements Serializable {
     @Column(name = "TITLE", unique = true, nullable = false, length = 100)
     private String title;
 
-    @Column(name = "DESC", nullable = false, length = 100)
-    private String desc;
+    @Column(name = "DESCRIPTION", nullable = false, length = 100)
+    private String description;
 
     @Column(name = "IMAGE", nullable = false, length = 300)
     private String image;
@@ -37,12 +39,12 @@ public class Cake implements Serializable {
         this.title = title;
     }
 
-    public String getDesc() {
-        return desc;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getImage() {
@@ -60,12 +62,12 @@ public class Cake implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Cake cake = (Cake) o;
         return Objects.equals(title, cake.title) &&
-                Objects.equals(desc, cake.desc) &&
+                Objects.equals(description, cake.description) &&
                 Objects.equals(image, cake.image);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, desc, image);
+        return Objects.hash(title, description, image);
     }
 }
