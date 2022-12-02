@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Cake 1 title",
+    "desc": "Cake 1 description",
+    "image": "Cake 1 image URL"
+  },
+  {
+    "title": "Cake 2 title",
+    "desc": "Cake 2 description",
+    "image": "Cake 2 image URL"
+  },
+  {
+    "title": "Cake 3 title",
+    "desc": "Cake 3 description",
+    "image": "Cake 3 image URL"
+  },
+  {
+    "title": "Cake 1 title",
+    "desc": "Cake 1 description",
+    "image": "Cake 1 image URL"
+  },
+  {
+    "title": "Cake 2 title",
+    "desc": "Cake 2 description",
+    "image": "Cake 2 image URL"
+  },
+  {
+    "title": "Cake 3 title",
+    "desc": "Cake 3 description",
+    "image": "Cake 3 image URL"
+  }
+]
