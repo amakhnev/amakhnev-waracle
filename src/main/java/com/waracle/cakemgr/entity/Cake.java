@@ -1,8 +1,12 @@
 package com.waracle.cakemgr.entity;
 
+import com.google.gson.annotations.SerializedName;
+import org.hibernate.annotations.GenericGenerator;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 import javax.persistence.*;
 
@@ -14,20 +18,22 @@ public class Cake implements Serializable {
     private static final long serialVersionUID = -1798070786993154676L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", unique = true, nullable = false)
-    private Integer id;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
     @Column(name = "TITLE", unique = true, nullable = false, length = 100)
     private String title;
 
     @Column(name = "DESCRIPTION", nullable = false, length = 100)
+    @SerializedName("desc")
     private String description;
 
     @Column(name = "IMAGE", nullable = false, length = 300)
     private String image;
 
-    public Integer getId() {
+    public UUID getId() {
         return id;
     }
 
