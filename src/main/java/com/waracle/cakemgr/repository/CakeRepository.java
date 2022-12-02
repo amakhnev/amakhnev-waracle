@@ -9,6 +9,6 @@ import java.util.UUID;
 @Repository
 public interface CakeRepository extends CrudRepository<Cake, UUID> {
 
-
+ boolean existsByTitleIgnoreCase(String title);
 
 }
