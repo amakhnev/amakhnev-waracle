@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -62,7 +64,7 @@ class CakeControllerTest {
     }
 
     @Test
-    void whenInvalidParameterReceived_thenBadRequestCodeShouldBeReturned() {
+    void whenInvalidParameterReceivedForGet_thenBadRequestCodeShouldBeReturned() {
 
         ResponseEntity<Cake> actual = restTemplate.getForEntity(URI.create("/cake/not-valid-uuid"), Cake.class);
 
@@ -98,6 +100,38 @@ class CakeControllerTest {
         assertEquals(toCreate.getTitle(),actual.getTitle());
         assertEquals(toCreate.getDescription(),actual.getDescription());
         assertEquals(toCreate.getImage(),actual.getImage());
+
+    }
+
+    @Test
+    void whenInvalidParameterReceivedForDelete_thenBadRequestCodeShouldBeReturned() {
+
+        ResponseEntity<Void> response =
+            restTemplate.exchange(URI.create("/cake/not-valid-uuid"), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
+
+    }
+
+    @Test
+    void whenNotExistingUUIDReceivedForDelete_thenNotFoundCodeShouldBeReturned() {
+
+        ResponseEntity<Void> response =
+                restTemplate.exchange(URI.create("/cake/"+UUID.randomUUID()), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+
+        assertEquals(HttpStatus.NOT_FOUND,response.getStatusCode());
+
+    }
+
+    @Test
+    void whenValidIdReceivedForDeletion_thenCakeShouldBeDeleted(){
+        Cake toDelete = repository.findAll().iterator().next();
+        ResponseEntity<Void> response =
+                restTemplate.exchange(URI.create("/cake/"+toDelete.getId()), HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+
+        assertEquals(HttpStatus.OK,response.getStatusCode());
+
+        assertTrue(repository.findById(toDelete.getId()).isEmpty());
 
     }
 }

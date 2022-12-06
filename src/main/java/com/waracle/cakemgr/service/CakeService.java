@@ -36,4 +36,9 @@ public class CakeService {
     public Cake createCake(Cake cake) {
         return repository.save(cake);
     }
+
+    public void deleteCake(UUID id) {
+        repository.deleteById(id);
+    }
+
 }
