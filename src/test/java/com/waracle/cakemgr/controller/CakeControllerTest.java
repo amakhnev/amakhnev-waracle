@@ -10,7 +10,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.util.UriComponentsBuilder;
+
 
 import java.net.URI;
 import java.util.UUID;
@@ -67,6 +67,37 @@ class CakeControllerTest {
         ResponseEntity<Cake> actual = restTemplate.getForEntity(URI.create("/cake/not-valid-uuid"), Cake.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, actual.getStatusCode());
+
+    }
+
+
+    @Test
+    void whenInvalidCakeForCreation_thenItShouldReturnValidationError(){
+        Cake toCreate = new Cake("","Valid description","");
+        ResponseEntity<Cake> actual = restTemplate.postForEntity(URI.create("/cake"), toCreate, Cake.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST,actual.getStatusCode());
+        // invalid fields will contain error text
+        assertNotNull(actual.getBody().getTitle());
+        assertNotNull(actual.getBody().getImage());
+
+        // valid fields will be null
+        assertNull(actual.getBody().getDescription());
+
+    }
+
+    @Test
+    void whenValidCakeForCreation_thenItShouldBeCreated(){
+        Cake toCreate = new Cake("Valid title","Valid description","Valid Image URL");
+        ResponseEntity<Cake> response = restTemplate.postForEntity(URI.create("/cake"), toCreate, Cake.class);
+
+        assertEquals(HttpStatus.CREATED,response.getStatusCode());
+        Cake actual = response.getBody();
+
+        assertNotNull(actual.getId());
+        assertEquals(toCreate.getTitle(),actual.getTitle());
+        assertEquals(toCreate.getDescription(),actual.getDescription());
+        assertEquals(toCreate.getImage(),actual.getImage());
 
     }
 }

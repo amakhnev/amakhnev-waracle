@@ -25,7 +25,7 @@ public class CakeService {
 
     public List<Cake> getCakes(){
         List<Cake> result = new ArrayList<>();
-        repository.findAll().forEach(cake -> result.add(cake));
+        repository.findAll().forEach(result::add);
         return result;
     }
 
@@ -33,5 +33,7 @@ public class CakeService {
         return repository.findById(id);
     }
 
-
+    public Cake createCake(Cake cake) {
+        return repository.save(cake);
+    }
 }
