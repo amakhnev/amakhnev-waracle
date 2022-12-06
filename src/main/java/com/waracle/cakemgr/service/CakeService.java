@@ -7,10 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class CakeService {
@@ -41,4 +38,11 @@ public class CakeService {
         repository.deleteById(id);
     }
 
+    public Cake updateCake(UUID id, Cake cake) {
+        if (repository.findById(id).isEmpty()){
+            throw new NoSuchElementException("Cake is not found");
+        }
+        cake.setId(id);
+        return repository.save(cake);
+    }
 }

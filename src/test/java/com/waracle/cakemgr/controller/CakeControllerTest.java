@@ -8,13 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 
 
 import java.net.URI;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -39,6 +38,7 @@ class CakeControllerTest {
         ResponseEntity<Cake[]> results = restTemplate.getForEntity(URI.create("/cake"), Cake[].class);
 
         assertEquals(HttpStatus.OK, results.getStatusCode());
+        assertNotNull(results.getBody());
         assertEquals(3, results.getBody().length);
 
     }
@@ -79,6 +79,8 @@ class CakeControllerTest {
         ResponseEntity<Cake> actual = restTemplate.postForEntity(URI.create("/cake"), toCreate, Cake.class);
 
         assertEquals(HttpStatus.BAD_REQUEST,actual.getStatusCode());
+
+        assertNotNull(actual.getBody());
         // invalid fields will contain error text
         assertNotNull(actual.getBody().getTitle());
         assertNotNull(actual.getBody().getImage());
@@ -90,10 +92,12 @@ class CakeControllerTest {
 
     @Test
     void whenValidCakeForCreation_thenItShouldBeCreated(){
-        Cake toCreate = new Cake("Valid title","Valid description","Valid Image URL");
+        Cake toCreate = new Cake("Valid title for creation","Valid description","Valid Image URL");
         ResponseEntity<Cake> response = restTemplate.postForEntity(URI.create("/cake"), toCreate, Cake.class);
 
         assertEquals(HttpStatus.CREATED,response.getStatusCode());
+
+        assertNotNull(response.getBody());
         Cake actual = response.getBody();
 
         assertNotNull(actual.getId());
@@ -134,4 +138,63 @@ class CakeControllerTest {
         assertTrue(repository.findById(toDelete.getId()).isEmpty());
 
     }
+
+    @Test
+    void whenInvalidIdReceivedForUpdate_thenBadRequestCodeShouldBeReturned(){
+        Cake toUpdate = new Cake("Valid title for update","Valid description","Valid Image URL");
+        ResponseEntity<Void> response = restTemplate.exchange(URI.create("/cake/invalid-uuid"), HttpMethod.PUT,new HttpEntity<>(toUpdate, HttpHeaders.EMPTY), Void.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
+
+    }
+
+
+    @Test
+    void whenNotExistingIdReceivedForUpdate_thenNotFoundCodeShouldBeReturned(){
+        Cake toUpdate = new Cake("Valid title for update","Valid description","Valid Image URL");
+        ResponseEntity<Void> response = restTemplate.exchange(URI.create("/cake/"+UUID.randomUUID()), HttpMethod.PUT,new HttpEntity<>(toUpdate, HttpHeaders.EMPTY), Void.class);
+
+        assertEquals(HttpStatus.NOT_FOUND,response.getStatusCode());
+
+    }
+
+    @Test
+    void whenInvalidCakeReceivedForUpdate_thenCakeShouldNotBeUpdated(){
+        Cake existing = repository.findAll().iterator().next();
+
+        Cake toUpdate = new Cake("","Valid description","");
+        ResponseEntity<Cake> response = restTemplate.exchange(URI.create("/cake/"+existing.getId()), HttpMethod.PUT,new HttpEntity<>(toUpdate, HttpHeaders.EMPTY), Cake.class);
+
+
+        assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
+
+        assertNotNull(response.getBody());
+        // invalid fields will contain error text
+        assertNotNull(response.getBody().getTitle());
+        assertNotNull(response.getBody().getImage());
+
+        // valid fields will be null
+        assertNull(response.getBody().getDescription());
+    }
+
+    @Test
+    void whenValidCakeReceivedForUpdate_thenCakeShouldBeUpdated(){
+        UUID existingId = repository.findAll().iterator().next().getId();
+
+        Cake toUpdate = new Cake("Valid title for update","Valid description","Valid Image URL");
+        ResponseEntity<Void> response = restTemplate.exchange(URI.create("/cake/"+existingId), HttpMethod.PUT,new HttpEntity<>(toUpdate, HttpHeaders.EMPTY), Void.class);
+
+        assertEquals(HttpStatus.OK,response.getStatusCode());
+
+        Optional<Cake> updated = repository.findById(existingId);
+        assertTrue(updated.isPresent());
+
+        assertEquals(existingId,updated.get().getId());
+        assertEquals(toUpdate.getTitle(),updated.get().getTitle());
+        assertEquals(toUpdate.getDescription(),updated.get().getDescription());
+        assertEquals(toUpdate.getImage(),updated.get().getImage());
+
+
+    }
+
 }
