@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CakeService {
@@ -27,5 +28,10 @@ public class CakeService {
         repository.findAll().forEach(cake -> result.add(cake));
         return result;
     }
+
+    public Optional<Cake> findById(UUID id) {
+        return repository.findById(id);
+    }
+
 
 }

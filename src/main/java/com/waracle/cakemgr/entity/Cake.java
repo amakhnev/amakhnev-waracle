@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "Cakes")
@@ -24,13 +26,19 @@ public class Cake implements Serializable {
     private UUID id;
 
     @Column(name = "TITLE", unique = true, nullable = false, length = 100)
+    @NotNull(message = "Title must not be null")
+    @Size(min = 1, max = 100, message = "Title must between {min} and {max} characters")
     private String title;
 
     @Column(name = "DESCRIPTION", nullable = false, length = 100)
     @SerializedName("desc")
+    @NotNull(message = "Description must not be null")
+    @Size(min = 1, max = 100, message = "Description must between {min} and {max} characters")
     private String description;
 
     @Column(name = "IMAGE", nullable = false, length = 300)
+    @NotNull(message = "Image URL must not be null")
+    @Size(min = 1, max = 300, message = "Image URL must between {min} and {max} characters")
     private String image;
 
     public Cake() {
